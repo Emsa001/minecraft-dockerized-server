@@ -1,0 +1,38 @@
+services:
+  minecraft:
+    build: .
+    ports:
+      - "25565:25565/tcp"
+      - "24454:24454/udp"
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+
+  backup:
+    build:
+      context: .
+      dockerfile: Dockerfile.backup
+    container_name: minecraft-backup
+    volumes:
+      - ./data:/data:ro
+      - ./backups:/backups
+      - ./secrets/backup-password:/run/secrets/backup-password:ro
+      - ./secrets/discord-webhook:/run/secrets/discord-webhook:ro
+    restart: unless-stopped
+    environment:
+      DOWNLOAD_BASE_URL: ""
+  
+  nginx:
+    image: nginx:alpine
+    container_name: minecraft-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./backups:/usr/share/nginx/html/backup:ro
+    restart: unless-stopped
+
+secrets:
+  backup-password: 
+    file: ./secrets/backup-password
+  discord-webhook: 
+    file: ./secrets/discord-webhook

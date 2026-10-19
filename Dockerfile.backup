@@ -1,0 +1,18 @@
+FROM debian:bookworm-slim
+
+ENV TZ=Europe/Warsaw
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       cron bash tzdata p7zip-full curl jq \
+    && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
+    && echo $TZ > /etc/timezone \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY backup.sh /usr/local/bin/backup.sh
+COPY backup-cron /etc/cron.d/minecraft-backup
+
+RUN chmod +x /usr/local/bin/backup.sh \
+    && chmod 0644 /etc/cron.d/minecraft-backup
+
+CMD ["cron", "-f"]
