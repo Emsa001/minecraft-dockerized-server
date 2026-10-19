@@ -1,5 +1,5 @@
 #!/bin/sh
-JAR="fabric.jar"
+JAR="/server/fabric.jar"
 
 # Heap sizing (safe for your RAM)
 MIN_RAM="6G"
